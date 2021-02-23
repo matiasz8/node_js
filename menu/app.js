@@ -8,7 +8,7 @@ const dir = new Directory();
 let interface = readline.createInterface(process.stdin, process.stdout);
 
 const tools = `
-Commans: :q = exit  |  :sa = save as  |  :s = save
+Commands: :q = exit  |  :sa = save as  |  :s = save
 ==================================================`;
 
 const screen = `
@@ -27,21 +27,20 @@ function mainScreen() {
         switch(res.trim()){
             case '1':
                 createFile();
-            break
-        
+            break;
+
             case '2':
                 openFileInterface();
-            break
-        
+            break;
+
             case '3':
-                interface.close()
-            break
+                interface.close();
+            break;
 
             default:
                 mainScreen();
-
         }
-    })
+    });
 }
 
 
@@ -53,56 +52,53 @@ function createFile(){
 
 
 function openFileInterface(){
-    let file = new Document(dir.getPath())
-    dir.getFilesInDir()
-    interface.question(Messages.requestFileName, name => {
-        if(file.exists(name)){
-            openFile(file, name)
-        }
-        else{
-            console.log(Messages.fileNotFound);
-            setTimeout(() => {
-                interface.removeAllListeners('line')
-                mainScreen()
-            }, 2000)
-        }
-    })
+    clear()
+    let file = new Document(dir.getPath());
+    dir.getFilesInDir();
 
+    interface.question(Messages.requestFileName, name =>{
+        if(file.exists(name)){
+            openFile(file, name);
+        }else{
+            console.log(Messages.fileNotFound);
+            setTimeout(() => { quit() }, 2000)
+        }
+    });
 }
 
-function openFile(file, name) {
-    file.open(name)
+function openFile(file, name){
+    file.open(name);
 
-    renderInterface(file)
-    readCommands(file)
+    renderInterface(file);
+    readCommands(file);
 }
 
 function renderInterface(file, message) {
     clear();
-    if (file.getName() == ''){
-        console.log(`| Untitle |`) 
-    }
-    else{
-        console.log(`| ${file.getName()} |`)
-    }
-    // (file.getName() == '') ? console.log(`| Untitle |`) : console.log(`| ${file.getName()} |`)
+    (file.getName() == '') ? console.log(`| Untitled |`) : console.log(`| ${file.getName()} |`)
 
     console.log(tools);
+
+    if(message != null) console.log(message);
+    console.log(file.getContent());
 }
 
 function readCommands(file) {
     interface.on('line', input => {
         switch(input.trim()){
-            case ":sa" : saveAs(file)
-            case ":q" : quit()
-            case ":s" : save(file)
+            case ':sa' : saveAs(file) 
+            break
+            case ':q' : quit()
+            break
+            case ':s' : save(file)
+            break
             default:
                 file.append(input.trim());
         }
     })
 }
 
-function saveAs(file) {
+function saveAs(file){
     interface.question(Messages.requestFileName, name => {
         if(file.exists(name)){
             console.log(Messages.fileExists);
@@ -117,8 +113,8 @@ function saveAs(file) {
             })
         }
         else{
-            renderInterface(file, Messages.fileSaved + '\n');
             file.saveAs(name);
+            renderInterface(file, Messages.fileSaved + '\n');
         }
     })
 }
